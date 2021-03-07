@@ -904,16 +904,14 @@ def unpackSeptets(septets, numberOfSeptets=None, prevOctet=None, shift=7):
 
 def decodeUcs2(byteIter, numBytes):
     """ Decodes UCS2-encoded text from the specified byte iterator, up to a maximum of numBytes """
-    userData = []
-    i = 0
+    userData = bytearray()
     try:
-        while i < numBytes:
-            userData.append(unichr((next(byteIter) << 8) | next(byteIter)))
-            i += 2
+        for b in byteIter:
+            userData.append(b)
     except StopIteration:
         # Not enough bytes in iterator to reach numBytes; return what we have
         pass
-    return ''.join(userData)
+    return userData.decode('utf-16-be')
 
 def encodeUcs2(text):
     """ UCS2 text encoding algorithm
@@ -925,12 +923,7 @@ def encodeUcs2(text):
     :return: A bytearray containing the string encoded in UCS2 encoding
     :rtype: bytearray
     """
-    result = bytearray()
-
-    for b in map(ord, text):
-        result.append(b >> 8)
-        result.append(b & 0xFF)
-    return result
+    return text.encode('utf-16-be')
 
 def divideTextUcs2(plainText):
     """ UCS-2 message dividing algorithm
